@@ -419,7 +419,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 223491064}
-  restartButton: {fileID: 952196922}
 --- !u!1 &888705867
 GameObject:
   m_ObjectHideFlags: 0
@@ -698,7 +697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.48076245, g: 1, b: 0.43867922, a: 0.16470589}
+  m_Color: {r: 0.03137255, g: 0.3764706, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

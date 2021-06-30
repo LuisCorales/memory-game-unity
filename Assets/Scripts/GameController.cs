@@ -8,9 +8,9 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     // TABLE AND CARDS
-    int rows = 5;
-    int columns = 6;
+    [SerializeField] int totalCards = 24;
     int matches;
+
     [SerializeField] List<GameObject> cardList;
     [SerializeField] Transform table;
     [SerializeField] GameObject card;
@@ -20,6 +20,8 @@ public class GameController : MonoBehaviour
     // MANAGING
     List<GameObject> flippedCards = new List<GameObject>();
     bool startedGame;
+    int tryCount;
+    bool firstTry;
 
     // COMPONENTS
     [SerializeField] Text matchesText;
@@ -31,18 +33,17 @@ public class GameController : MonoBehaviour
 
     // PROPERTIES
     [SerializeField] GameObject blockPanel;
-    public int TryCount { get; set; }
 
     void Start()
     {
-        SetCards(rows * columns);
+        SetCards(totalCards);
         timerText.text = timeCount.ToString("F2");
-        matches = rows * columns / 2;
+        matches = totalCards / 2;
     }
 
     void Update()
     {
-        if (!isPlaying && timeCount == 0 && startedGame == true)
+        if (firstTry && timeCount == 0)
         {
             StartGame();
         }
@@ -51,6 +52,8 @@ public class GameController : MonoBehaviour
         {
             HandleTimer();
         }
+
+        matchesText.text = "Pares faltantes: " + matches;
 
         if (matches < 1)
         {
@@ -65,17 +68,13 @@ public class GameController : MonoBehaviour
 
     void StartGame()
     {
-        // TODO: toggle isPlaying when clicking the first card
         isPlaying = true;
-
-        // Turn true when clicking a card for the first time
-        startedGame = true;
     }
 
     IEnumerator EndGame()
     {
-        CrossSceneInformation.TimeCount = timeCount.ToString("F2");
-        yield return new WaitForSeconds(3);
+        CrossSceneInformation.TimeCount = timeCount;
+        yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene(2);
     }
 
@@ -87,15 +86,25 @@ public class GameController : MonoBehaviour
 
     public void CheckFlippedCards()
     {
-        for (int i = 0; i < cardList.Count; i++)
+        if(!firstTry)
         {
-            if (cardList[i].GetComponent<Card>().IsFlipped)
-            {
-                flippedCards.Add(cardList[i]);
-            }
+            firstTry = true;
         }
 
-        StartCoroutine(CheckMatches(flippedCards[0], flippedCards[1]));
+        tryCount++;
+
+        if(tryCount == 2)
+        {
+            for (int i = 0; i < cardList.Count; i++)
+            {
+                if (cardList[i].GetComponent<Card>().IsFlipped)
+                {
+                    flippedCards.Add(cardList[i]);
+                }
+            }
+
+            StartCoroutine(CheckMatches(flippedCards[0], flippedCards[1]));
+        }
     }
 
     IEnumerator CheckMatches(GameObject flippedCard1, GameObject flippedCard2)
@@ -104,7 +113,9 @@ public class GameController : MonoBehaviour
 
         if (flippedCard1.transform.GetChild(1).GetComponent<Image>().sprite.name == flippedCard2.transform.GetChild(1).GetComponent<Image>().sprite.name)
         {
-            yield return new WaitForSeconds(1);
+            matches--;
+            
+            yield return new WaitForSeconds(0.5f);
 
             flippedCard1.transform.GetChild(0).GetComponent<Image>().enabled = false;
             flippedCard1.transform.GetChild(1).GetComponent<Image>().enabled = false;
@@ -114,23 +125,20 @@ public class GameController : MonoBehaviour
 
             flippedCard1.GetComponent<Card>().IsFlipped = false;
             flippedCard2.GetComponent<Card>().IsFlipped = false;
-
-            matches--;
         }
         else
         {
-            yield return new WaitForSeconds(1);
-            Debug.Log("NO SON IGUALES");
+            yield return new WaitForSeconds(0.5f);
             flippedCard1.GetComponent<Card>().FlipCard();
             flippedCard2.GetComponent<Card>().FlipCard();
         }
 
-        TryCount = 0;
+        tryCount = 0;
 
         flippedCards.Clear();
         blockPanel.SetActive(false);
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
     }
 
     void SetCards(int quantity)

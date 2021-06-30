@@ -22,12 +22,6 @@ public class Card : MonoBehaviour
     {
         IsFlipped = !IsFlipped;
         animator.SetBool("IsFlipped", IsFlipped);
-
-        controller.TryCount++;
-
-        if (controller.TryCount == 2)
-        {
-            controller.CheckFlippedCards();
-        }
+        controller.CheckFlippedCards();
     }
 }
