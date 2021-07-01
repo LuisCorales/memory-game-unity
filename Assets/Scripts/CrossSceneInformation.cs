@@ -6,4 +6,5 @@ public static class CrossSceneInformation
 {
     public static float TimeCount { get; set; }
     public static string Username { get; set; }
+    public static string Email { get; set; }
 }
